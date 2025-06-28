@@ -21,7 +21,13 @@ class Controller{
 
     updateCount(){
         for (const subscriber of this.countSubscribers){
-            subscriber.newCount(this.countModel.count)
+
+            // if view not in scene, no need to update it
+            if (subscriber.setStateMethods.count === undefined){
+                continue
+            }
+
+            subscriber.setStateMethods.count(this.countModel.count)
         }
     }
 }

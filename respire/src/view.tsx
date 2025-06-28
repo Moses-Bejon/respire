@@ -3,26 +3,26 @@ import './App.css'
 
 import {controller} from "./controller.ts";
 
+// in the real thing this would be pulled out of any specific view file:
+type StateIdentifier = "count"
+type SetStateMethods = {
+    [Key in StateIdentifier]?: Function;
+};
+
 export class View{
+    setStateMethods: SetStateMethods
 
     constructor() {
+        this.setStateMethods = {}
+
         controller.subscribeToCount(this)
     }
 
-    // declared here so that TS doesn't get mad at me:
-    setNewCountFunction(count: number){
-
-    }// (it's still mad, but at least it compiles it)
-
-    // this function must be run before newCount for this preview to work
-    // can be made to not be the case in future versions
-    // one (potentially problematic but potentially elegant) way to do this would be to run the contents of App in the...
-    // constructor 😬
     App() {
         const [count, setCount] = useState(0)
 
         // this is so the controller can set the count:
-        this.setNewCountFunction = setCount
+        this.setStateMethods["count"] = setCount
 
         return (
             <>
@@ -34,9 +34,5 @@ export class View{
                 </button>
             </>
         )
-    }
-
-    newCount(count: number){
-        this.setNewCountFunction(count)
     }
 }
