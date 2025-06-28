@@ -1,10 +1,10 @@
-# respire
+# Respire
 
 Respire is an intelligent music player that uses the emotional elements of songs to determine what it should play when.
 
 See current webpage here (not done) : https://moses-bejon.github.io/respire/
 
-To set up respire in a development environment, follow the following steps:
+To set up Respire in a development environment, follow the following steps:
 
 1. Clone the repository
 2. Navigate within the respire directory of the respire project (i.e. your file path should end in /respire/respire)
