@@ -12,7 +12,7 @@ export class View{
     // declared here so that TS doesn't get mad at me:
     setNewCountFunction(count: number){
 
-    }
+    }// (it's still mad, but at least it compiles it)
 
     // this function must be run before newCount for this preview to work
     // can be made to not be the case in future versions
