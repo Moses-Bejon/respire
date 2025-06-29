@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 import {controller} from "./controller.ts";
@@ -18,11 +18,19 @@ export class View{
         controller.subscribeToCount(this)
     }
 
+    addSetter(stateName:StateIdentifier,setState:Function){
+        this.setStateMethods[stateName] = setState
+
+        return () => {delete this.setStateMethods[stateName]}
+    }
+
     App() {
         const [count, setCount] = useState(0)
 
-        // this is so the controller can set the count:
-        this.setStateMethods["count"] = setCount
+        useEffect(() => {
+            // this is so the controller can set the count:
+            return this.addSetter("count",setCount)
+        }, []);
 
         return (
             <>
