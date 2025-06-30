@@ -10,18 +10,18 @@ class Controller{
         this.countModel = new CountModel()
     }
 
-    increment(){
+    public increment(){
         this.countModel.increment()
         this.updateCount()
     }
 
-    subscribeToCount(subscriber: CountButton){
+    public subscribeToCount(subscriber: CountButton){
         this.countSubscribers.add(subscriber)
 
         return this.countModel.read()
     }
 
-    updateCount(){
+    private updateCount(){
         for (const subscriber of this.countSubscribers){
             subscriber.newCount(this.countModel.read())
         }
