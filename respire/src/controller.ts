@@ -1,9 +1,9 @@
-import {View} from "./view.tsx";
 import {CountModel} from "./countModel.ts";
+import type {CountView} from "./countView.tsx";
 
 class Controller{
-    countSubscribers: Set<View>
-    countModel: CountModel
+    private readonly countSubscribers: Set<CountView>
+    private countModel: CountModel
 
     constructor() {
         this.countSubscribers = new Set()
@@ -15,19 +15,13 @@ class Controller{
         this.updateCount()
     }
 
-    subscribeToCount(subscriber: View){
+    subscribeToCount(subscriber: CountView){
         this.countSubscribers.add(subscriber)
     }
 
     updateCount(){
         for (const subscriber of this.countSubscribers){
-
-            // if view not in scene, no need to update it
-            if (subscriber.setStateMethods.count === undefined){
-                continue
-            }
-
-            subscriber.setStateMethods.count(this.countModel.count)
+            subscriber.newCount(this.countModel.read())
         }
     }
 }

@@ -1,12 +1,16 @@
 export class CountModel{
 
-    count: number
+    private count: number
 
     constructor() {
         this.count = 0
     }
 
-    increment(){
+    public increment(){
         this.count ++
+    }
+
+    public read(){
+        return this.count
     }
 }

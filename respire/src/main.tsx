@@ -1,9 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import {View} from './view.tsx'
+import {CountView} from "./countView.tsx";
 
-const aView = new View()
+const aView = new CountView()
 const App = aView.App.bind(aView)
 
 createRoot(document.getElementById('root')!).render(
