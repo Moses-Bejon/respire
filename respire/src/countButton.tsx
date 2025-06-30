@@ -5,14 +5,16 @@ import {controller} from "./controller.ts";
 import {View} from "./view.ts";
 
 export class CountButton extends View{
+    private readonly currentCount: number
+
     constructor() {
         super()
-        controller.subscribeToCount(this)
+        this.currentCount = controller.subscribeToCount(this)
     }
 
     public App() {
 
-        const [count, setCount] = useState(0)
+        const [count, setCount] = useState(this.currentCount)
 
         this.useNewSetter("count",setCount)
 

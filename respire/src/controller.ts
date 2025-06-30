@@ -17,6 +17,8 @@ class Controller{
 
     subscribeToCount(subscriber: CountButton){
         this.countSubscribers.add(subscriber)
+
+        return this.countModel.read()
     }
 
     updateCount(){
