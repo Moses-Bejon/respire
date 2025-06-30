@@ -1,8 +1,8 @@
 import {CountModel} from "./countModel.ts";
-import type {CountView} from "./countView.tsx";
+import type {CountButton} from "./countButton.tsx";
 
 class Controller{
-    private readonly countSubscribers: Set<CountView>
+    private readonly countSubscribers: Set<CountButton>
     private countModel: CountModel
 
     constructor() {
@@ -15,7 +15,7 @@ class Controller{
         this.updateCount()
     }
 
-    subscribeToCount(subscriber: CountView){
+    subscribeToCount(subscriber: CountButton){
         this.countSubscribers.add(subscriber)
     }
 

@@ -4,7 +4,7 @@ import './countApp.css'
 import {controller} from "./controller.ts";
 import {View} from "./view.ts";
 
-export class CountView extends View{
+export class CountButton extends View{
     constructor() {
         super()
         controller.subscribeToCount(this)
