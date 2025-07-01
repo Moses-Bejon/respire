@@ -26,10 +26,6 @@ export function Player({ count }: PlayerProps) {
   );
 }
 
-type SongInfoProps = {
-  count: number;
-  // Add more prop-type pairs here, and just add the prop identifier to {} in function arguments
-};
 function SongInfo() {
   const count = useContext(CountContext);
   return (
