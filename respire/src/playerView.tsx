@@ -1,36 +1,55 @@
-import { useState } from "react";
-import "./countApp.css";
+import {useEffect, useState} from "react";
 
+import "./countApp.css";
 import { controller } from "./controller.ts";
 import { Player } from "./Player.tsx";
 import { View } from "./view.ts";
+import type {Song} from "./customTypes.ts";
 
 export class PlayerView extends View {
-  private readonly currentCount: number;
+  private readonly currentSong: Song;
+  private readonly audioSource: HTMLAudioElement;
 
   constructor() {
     super();
-    this.currentCount = controller.subscribeToCount(this);
+    this.currentSong = controller.subscribeToCurrentSong(this);
+    this.audioSource = new Audio(this.currentSong.source);
+
+      this.audioSource.addEventListener("ended",() => {
+          controller.requestNewSong();
+      });
   }
 
   public App() {
-    const [count, setCount] = useState(this.currentCount);
+    const currentTitle = this.currentSong.title;
 
-    this.useNewSetter("count", setCount);
+    const [title, setTitle] = useState(currentTitle);
+
+      useEffect(() => {
+          this.audioSource.play();
+
+          return () => {this.audioSource.pause()}
+      }, [title]);
+
+    this.useNewSetter("title", setTitle);
 
     return (
       <>
-        <p>Counter to increase song being played:</p>
-        <button onClick={() => controller.increment()}>
+        <p>Press to go to next song:</p>
+        <button onClick={() => controller.requestNewSong()}>
           {" "}
-          count is {count}
+          title is {title}
         </button>
-        <Player count={count} />
+        <br />
+        <br />
+        <br />
+        <Player title={title} />
       </>
     );
   }
 
-  public newCount(count: number) {
-    this.setState("count", count);
+  public newSong(song:Song){
+      this.setState("title",song.title);
+      this.audioSource.src = song.source;
   }
 }
