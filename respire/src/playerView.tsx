@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-import "./countApp.css";
+import "./app.css";
 import { controller } from "./controller.ts";
 import { Player } from "./Player.tsx";
 import { View } from "./view.ts";
