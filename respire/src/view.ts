@@ -1,10 +1,5 @@
 import {type ReactNode, useEffect} from "react";
-
-// as new states are added, this needs to be extended, i.e. "count"|"songTitle"|...
-type StateIdentifier = "count"
-type SetStateMethods = {
-    [Key in StateIdentifier]?: Function;
-};
+import {type StateIdentifier, type SetStateMethods} from "./customTypes.ts";
 
 export abstract class View{
     private readonly setStateMethods: SetStateMethods
