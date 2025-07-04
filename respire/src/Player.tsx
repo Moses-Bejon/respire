@@ -1,37 +1,28 @@
 import { useContext } from "react";
-import { CountContext } from "./CountContext";
+import { TitleContext } from "./TitleContext.ts";
 
 type PlayerProps = {
-  count: number;
+  title: string;
   // Add more prop-type pairs here, and just add the prop identifier to {} in function arguments
 };
 
-const songInfos = [
-  {
-    title: "Hello world",
-  },
-  {
-    title: "Goodbye world",
-  },
-];
-
-export function Player({ count }: PlayerProps) {
+export function Player({ title }: PlayerProps) {
   return (
     <div>
-      <CountContext value={count}>
-        {count}th song playing
+      <TitleContext value={title}>
+        {title} is playing
         <SongInfo />
-      </CountContext>
+      </TitleContext>
     </div>
   );
 }
 
 function SongInfo() {
-  const count = useContext(CountContext);
+  const title = useContext(TitleContext);
   return (
     <div>
       {/* Will need a forEach or something for each piece of info */}
-      Title: {songInfos[count].title}
+      Title: {title}
     </div>
   );
 }
