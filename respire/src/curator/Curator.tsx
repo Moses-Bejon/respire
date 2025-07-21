@@ -5,7 +5,7 @@ export function Curator() {
     return (
         <>
             <FileInput
-                uploadName="mp3"
+                uploadName="audio file"
                 fileUploadCallback={controller.uploadNewSong.bind(controller)}
                 accept="audio/*"
             />

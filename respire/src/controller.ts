@@ -55,7 +55,7 @@ class Controller{
         reader.onload = () => {
             const newSong:Song = {
                 title: "newSong",
-                sourceFormat: "mp3",
+                sourceFormat: "local",
                 source: reader.result as string
             };
 
