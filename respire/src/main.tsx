@@ -1,10 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import { PlayerView } from './playerView.tsx';
-
-const aView = new PlayerView()
-const App = aView.App.bind(aView)
+import {App} from './App'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

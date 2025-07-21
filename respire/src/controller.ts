@@ -1,9 +1,9 @@
-import {type CurrentSongSubscriber, type Song} from "./customTypes.ts";
-import {SongsModel,file} from "./songsModel.ts";
+import {SongsModel} from "./songsModel.ts";
+import {type Song} from "./customTypes.ts";
 
 class Controller{
     private readonly antiRepetitionBias: number;
-    private readonly currentSongSubscribers: Set<CurrentSongSubscriber>;
+    private readonly currentSongSubscribers: Set<(song: Song) => void>;
     private songsModel: SongsModel;
     private currentSong: Song;
     private readonly audioSource: HTMLAudioElement;
@@ -12,7 +12,7 @@ class Controller{
 
         this.antiRepetitionBias = 1;
 
-        this.songsModel = new SongsModel(file);
+        this.songsModel = new SongsModel();
         this.currentSong = this.songsModel.pickSong(this.antiRepetitionBias);
 
         this.audioSource = new Audio(this.currentSong.source);
@@ -26,27 +26,43 @@ class Controller{
         this.currentSongSubscribers = new Set();
     }
 
-    public subscribeToCurrentSong(subscriber: CurrentSongSubscriber){
-        this.currentSongSubscribers.add(subscriber);
+    public subscribeToCurrentSong(setSong: (song: Song) => void):() => void{
+        this.currentSongSubscribers.add(setSong);
+        setSong(this.currentSong);
 
-        return this.currentSong;
-    }
-
-    public unsubscribeToCurrentSong(subscriber: CurrentSongSubscriber){
-        this.currentSongSubscribers.delete(subscriber);
+        return () => {
+            this.currentSongSubscribers.delete(setSong);
+        };
     }
 
     // called by views to request a new song, i.e. if song finishes or user skips
-    public requestNewSong(){
+    public requestNewSong():void{
+
+        this.currentSong = this.songsModel.pickSong(this.antiRepetitionBias);
 
         this.audioSource.src = this.currentSong.source;
         this.audioSource.play();
 
-        this.currentSong = this.songsModel.pickSong(this.antiRepetitionBias);
-
         for (const subscriber of this.currentSongSubscribers){
-            subscriber.newSong(this.currentSong);
+            subscriber(this.currentSong)
         }
+    }
+
+    public uploadNewSong(songFile:File):void{
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const newSong:Song = {
+                title: "newSong",
+                sourceFormat: "mp3",
+                source: reader.result as string
+            };
+
+            this.songsModel.addSong(newSong);
+        }
+
+        reader.readAsDataURL(songFile);
     }
 }
 
