@@ -1,8 +1,6 @@
 nav {
   display: flex;
   flex-direction: row;
-  align-content: center;
-  justify-content: space-around;
 
   border-radius: 1vh;
   margin: 0.6vh;
