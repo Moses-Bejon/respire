@@ -8,39 +8,44 @@ export function FileInput(
                             accept: string;
                         }
     ){
-    
-    const handleFileSelect = () => {
+
+    const handleFileSelect = ():void => {
 
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = accept;
+        fileInput.multiple = true;
 
         fileInput.onchange = (event: Event) => {
 
             const input = event.target as HTMLInputElement;
 
-            if (!input.files || input.files.length === 0){
+            if (!input.files){
                 throw new Error("target does not have files");
             }
 
-            const file = input.files[0];
-
-            fileUploadCallback(file);
+            for (const file of input.files){
+                fileUploadCallback(file);
+            }
         }
 
         fileInput.click();
     };
 
-    const handleDragOver = (event: DragEvent) => {
+    const handleDragOver = (event: DragEvent):void => {
         event.preventDefault();
         event.dataTransfer.dropEffect = 'copy';
     }
 
-    const handleDrop = (event: DragEvent) => {
+    const handleDrop = (event: DragEvent):void => {
         event.preventDefault();
         const files = event.dataTransfer?.files;
-        const file = files && files.length > 0 ? files[0] : undefined;
-        if (file) {
+
+        if (!files){
+            throw new Error("event does not have files");
+        }
+
+        for (const file of files){
             fileUploadCallback(file);
         }
     }

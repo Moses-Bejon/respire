@@ -12,13 +12,33 @@ export class SongsModel{
         this.songProbabilities = Array(this.numberOfSongs).fill(1);
     }
 
-    addSong(song:Song):void{
+    private checkTitleUniqueness(title:string):boolean{
+        for (const song of this.songs){
+            if (song.title === title){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public addSong(song:Song):void{
+
+        // ensure title is unique
+        const titlePrefix = song.title;
+        let i = 0;
+
+        while (!this.checkTitleUniqueness(song.title)){
+            i++;
+
+            song.title = `${titlePrefix} (${i})`;
+        }
+
         this.songs.push(song);
         this.numberOfSongs ++;
         this.songProbabilities.push(1);
     }
 
-    pickSong(antiRepetitionBias:number):Song{
+    public pickSong(antiRepetitionBias:number):Song{
 
         // if no songs are uploaded
         if (this.numberOfSongs === 0){
@@ -66,5 +86,9 @@ export class SongsModel{
         this.songProbabilities[chosenSongIndex] = 0;
 
         return this.songs[chosenSongIndex];
+    }
+
+    public getSongs():Song[]{
+        return structuredClone(this.songs);
     }
 }

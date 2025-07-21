@@ -4,6 +4,7 @@ import {type Song} from "./customTypes.ts";
 class Controller{
     private readonly antiRepetitionBias: number;
     private readonly currentSongSubscribers: Set<(song: Song) => void>;
+    private readonly allSongsSubscribers: Set<(songs: Song[]) => void>;
     private songsModel: SongsModel;
     private currentSong: Song;
     private readonly audioSource: HTMLAudioElement;
@@ -24,6 +25,7 @@ class Controller{
         this.audioSource.play();
 
         this.currentSongSubscribers = new Set();
+        this.allSongsSubscribers = new Set();
     }
 
     public subscribeToCurrentSong(setSong: (song: Song) => void):() => void{
@@ -33,6 +35,21 @@ class Controller{
         return () => {
             this.currentSongSubscribers.delete(setSong);
         };
+    }
+
+    public subscribeToAllSongs(setSongs: (songs: Song[]) => void):() => void{
+        this.allSongsSubscribers.add(setSongs);
+        setSongs(this.songsModel.getSongs());
+
+        return () => {
+            this.allSongsSubscribers.delete(setSongs);
+        };
+    }
+
+    private updateAllSongs():void{
+        for (const subscriber of this.allSongsSubscribers){
+            subscriber(this.songsModel.getSongs());
+        }
     }
 
     // called by views to request a new song, i.e. if song finishes or user skips
@@ -60,6 +77,8 @@ class Controller{
             };
 
             this.songsModel.addSong(newSong);
+
+            this.updateAllSongs();
         }
 
         reader.readAsDataURL(songFile);
