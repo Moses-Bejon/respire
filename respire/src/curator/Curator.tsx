@@ -1,24 +1,14 @@
-import {useRef, type ChangeEvent} from "react";
-import {controller} from "../controller";
+import {FileInput} from "./fileInput.tsx";
+import {controller} from "../controller.ts";
 
-export function Curator(){
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0] || null;
-        if (file !== null) {
-            controller.uploadNewSong(file);
-        }
-    };
-
+export function Curator() {
     return (
         <>
-            <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileSelect}
-                accept="*/*"
+            <FileInput
+                uploadName="mp3"
+                fileUploadCallback={controller.uploadNewSong.bind(controller)}
+                accept="audio/*"
             />
         </>
-    );
+    )
 }
