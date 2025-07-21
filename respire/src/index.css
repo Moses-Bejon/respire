@@ -1,4 +1,9 @@
 body {
-  display: flex;
-  place-items: center;
+  font-family: sans-serif;
+  color: white;
+
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background: linear-gradient(to bottom, #111111, #000000);
 }

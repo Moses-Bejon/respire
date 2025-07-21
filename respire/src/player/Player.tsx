@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import "../app.css";
 import { controller } from "../controller.ts";
 import type {Song} from "../customTypes.ts";
 import {threeSecondSilence} from "../../public/silence.ts";
