@@ -14,9 +14,9 @@ export function Curator() {
 
     return (
         <>
-            <h1>Upload a song:</h1>
+            <h1>Songs to upload:</h1>
             <SongInput />
-            <h1>Songs already uploaded:</h1>
+            <h1>Songs uploaded:</h1>
             <SongsList songArray={songList} />
         </>
     )
