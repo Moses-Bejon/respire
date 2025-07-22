@@ -1,5 +1,6 @@
 import {type Song} from "./customTypes.ts";
 import {threeSecondSilence} from "../public/silence.ts";
+import {getUniqueStringWithPrefix} from "./lib/strings.ts";
 
 export class SongsModel{
     private readonly songs:Song[];
@@ -12,26 +13,10 @@ export class SongsModel{
         this.songProbabilities = Array(this.numberOfSongs).fill(1);
     }
 
-    private checkTitleUniqueness(title:string):boolean{
-        for (const song of this.songs){
-            if (song.title === title){
-                return false;
-            }
-        }
-        return true;
-    }
-
     public addSong(song:Song):void{
 
-        // ensure title is unique
-        const titlePrefix = song.title;
-        let i = 0;
-
-        while (!this.checkTitleUniqueness(song.title)){
-            i++;
-
-            song.title = `${titlePrefix} (${i})`;
-        }
+        // ensures no two titles are the same
+        song.title = getUniqueStringWithPrefix(song.title,this.songs.map((song) => song.title));
 
         this.songs.push(song);
         this.numberOfSongs ++;

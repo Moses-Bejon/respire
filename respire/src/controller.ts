@@ -65,23 +65,9 @@ class Controller{
         }
     }
 
-    public uploadNewSong(songFile:File):void{
-
-        const reader = new FileReader();
-
-        reader.onload = () => {
-            const newSong:Song = {
-                title: "newSong",
-                sourceFormat: "local",
-                source: reader.result as string
-            };
-
-            this.songsModel.addSong(newSong);
-
-            this.updateAllSongs();
-        }
-
-        reader.readAsDataURL(songFile);
+    public uploadNewSong(song:Song):void{
+        this.songsModel.addSong(song);
+        this.updateAllSongs();
     }
 }
 
