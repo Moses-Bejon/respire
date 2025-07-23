@@ -1,11 +1,11 @@
 import {type Song} from "../customTypes.ts";
 import {SongEntry} from "./songEntry.tsx";
 
-export function SongsList({songArray, deleteSongIndex, updateSongIndex}:
+export function SongsList({songArray, deleteSongIndex, updateSongAtIndex}:
                           {
                               songArray:Song[],
                               deleteSongIndex: (index:number) => void,
-                              updateSongIndex: <K extends keyof Song>(index:number,attribute:K,value:Song[K]) => void
+                              updateSongAtIndex: <K extends keyof Song>(index:number,attribute:K,value:Song[K]) => void
                           }){
 
     return (
@@ -16,7 +16,7 @@ export function SongsList({songArray, deleteSongIndex, updateSongIndex}:
                         song={song}
                         deleteCallback={() => {deleteSongIndex(index);}}
                         updateAttributeCallback={
-                        <K extends keyof Song>(attribute:K, value:Song[K]) => {updateSongIndex(index,attribute,value);}}
+                        <K extends keyof Song>(attribute:K, value:Song[K]) => {updateSongAtIndex(index,attribute,value);}}
                     />
                 </li>
             ))}

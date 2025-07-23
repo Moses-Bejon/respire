@@ -29,7 +29,16 @@ export class SongsModel{
         this.songProbabilities.splice(index,1);
     }
 
-    public updateSongIndex<K extends keyof Song>(index:number,attribute:K,value:Song[K]):void{
+    public updateSongAtIndex<K extends keyof Song>(index:number,attribute:K,value:Song[K]):void{
+
+        // ensures titles are unique
+        if (attribute === "title"){
+            this.songs[index].title = getUniqueStringWithPrefix(
+                value as string,this.songs.map((song) => song.title)
+            );
+            return;
+        }
+
         this.songs[index][attribute] = value;
     }
 

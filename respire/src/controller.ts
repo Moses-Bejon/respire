@@ -75,8 +75,8 @@ class Controller{
         this.updateAllSongs();
     }
 
-    public updateSongIndex<K extends keyof Song>(index:number,attribute:K,value:Song[K]){
-        this.songsModel.updateSongIndex(index,attribute,value);
+    public updateSongAtIndex<K extends keyof Song>(index:number,attribute:K,value:Song[K]){
+        this.songsModel.updateSongAtIndex(index,attribute,value);
         this.updateAllSongs();
     }
 }

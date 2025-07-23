@@ -1,4 +1,5 @@
 import type {Song} from "../customTypes.ts";
+import "./songEntry.css";
 
 export function SongEntry({song, deleteCallback, updateAttributeCallback}:
                           {
@@ -8,13 +9,13 @@ export function SongEntry({song, deleteCallback, updateAttributeCallback}:
                           }) {
 
     return (
-        <div>
+        <div className="songEntry">
             <input value={song.title} onChange={
                 (event) => {
                     updateAttributeCallback("title",event.target.value);
                 }
             }></input>
-            <button onClick={deleteCallback}>Delete</button>
+            <img src={"public/icons/trash.svg"} alt={"delete button"} onClick={deleteCallback} />
         </div>
     )
 }

@@ -20,7 +20,7 @@ export function Curator() {
             <SongsList
                 songArray={songList}
                 deleteSongIndex={controller.deleteSongIndex.bind(controller)}
-                updateSongIndex={controller.updateSongIndex.bind(controller)}
+                updateSongAtIndex={controller.updateSongAtIndex.bind(controller)}
             />
         </>
     )

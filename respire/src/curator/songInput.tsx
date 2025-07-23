@@ -41,7 +41,7 @@ export function SongInput() {
         })
     }
 
-    const updateSongIndex = <K extends keyof Song>(index:number,attribute:K,value:Song[K]):void => {
+    const updateSongAtIndex = <K extends keyof Song>(index:number,attribute:K,value:Song[K]):void => {
         setUploads((prevState) => {
             const newSongs = [...prevState];
             newSongs[index][attribute] = value;
@@ -82,7 +82,7 @@ export function SongInput() {
                 <p>Spotify upload option - Coming soon</p>
             )}
 
-            <SongsList songArray={uploads} deleteSongIndex={deleteSongIndex} updateSongIndex={updateSongIndex}/>
+            <SongsList songArray={uploads} deleteSongIndex={deleteSongIndex} updateSongAtIndex={updateSongAtIndex}/>
 
             <button onClick={sendToController}>Upload</button>
 
