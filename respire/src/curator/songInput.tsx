@@ -61,10 +61,6 @@ export function SongInput() {
     return (
         <div className="songInput">
 
-            <SongsList songArray={uploads} deleteSongIndex={deleteSongIndex} updateSongAtIndex={updateSongAtIndex}/>
-
-            <br />
-
             Upload from:
             <select
                 value={selectedSource}
@@ -89,7 +85,12 @@ export function SongInput() {
                 <p>Spotify upload option - Coming soon</p>
             )}
 
-            <button onClick={sendToController}>Upload</button>
+            <SongsList songArray={uploads} deleteSongIndex={deleteSongIndex} updateSongAtIndex={updateSongAtIndex}/>
+
+            <div className={"buttons"}>
+                <button className={"finishUploadButton"} onClick={sendToController}>Finish upload</button>
+                <button className={"clearButton"} onClick={() => setUploads([])}>Clear</button>
+            </div>
 
         </div>
     )

@@ -1,0 +1,24 @@
+.buttons{
+    display: flex;
+    flex-direction: row;
+
+    height: 50px;
+}
+
+.buttons > button{
+    border: none;
+    font-size: inherit;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+.finishUploadButton{
+    flex: 5;
+    background-color: lightgreen;
+}
+
+.clearButton{
+    flex: 1;
+    background-color: lightcoral;
+}

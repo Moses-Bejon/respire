@@ -1,5 +1,6 @@
 .fileInput {
     border: lightgray dashed 3px;
+    border-radius: 5vh;
     box-sizing: border-box;
 
     width: 98%;
