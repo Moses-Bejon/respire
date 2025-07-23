@@ -53,7 +53,7 @@ export function FileInput(
 
     return (
         <div className={"fileInput"} onClick={handleFileSelect} onDragOver={handleDragOver} onDrop={handleDrop}>
-            <img src={"public/icons/file.svg"} alt={"upload file image"}/>
+            <img src={"icons/file.svg"} alt={"upload file image"}/>
             Drag and drop {uploadName} file(s) here, or click me
         </div>
     );
