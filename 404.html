@@ -1,5 +1,6 @@
 <script>
     // Redirect all paths back to index.html with correct URL
+    // the slice removes the /respire bit, which would otherwise mess up future routing
     const pathname = window.location.pathname.slice(9);
     window.location.replace("/respire/index.html?redirect=" + pathname);
 </script>
