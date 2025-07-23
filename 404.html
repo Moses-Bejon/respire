@@ -1,5 +1,5 @@
 <script>
     // Redirect all paths back to index.html with correct URL
-    const pathname = window.location.pathname;
-    window.location.replace("/index.html?redirect=" + pathname);
+    const pathname = window.location.pathname.slice(7);
+    window.location.replace("/respire/index.html?redirect=" + pathname);
 </script>
