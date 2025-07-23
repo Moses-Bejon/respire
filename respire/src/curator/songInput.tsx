@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState,useEffect,useRef} from 'react';
 import {FileInput} from './fileInput';
 import type {Song} from '../customTypes.ts';
 import {SongsList} from "./songsList.tsx";
@@ -9,6 +9,11 @@ import "./songInput.css";
 export function SongInput() {
     const [selectedSource, setSelectedSource] = useState<'local' | 'youtube' | 'spotify'>('local');
     const [uploads, setUploads] = useState<Song[]>([]);
+    const uploadsRef = useRef(uploads);
+
+    useEffect(() => {
+        uploadsRef.current = uploads;
+    },[uploads]);
 
     const uploadLocal = (source: File, title?: string):void => {
 
@@ -57,6 +62,20 @@ export function SongInput() {
 
         setUploads([]);
     }
+
+    // when dismounted, I will assume the user forgot to save their uploads and prompt them
+    useEffect(() => {
+        return () => {
+            if (uploadsRef.current.length > 0){
+                const shouldSend = window.confirm("You have unsaved uploads. Would you like to save them?");
+                if (shouldSend) {
+                    for (const song of uploadsRef.current){
+                        controller.uploadNewSong(song);
+                    }
+                }
+            }
+        }
+    },[])
 
     return (
         <div className="songInput">
