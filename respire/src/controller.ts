@@ -69,6 +69,16 @@ class Controller{
         this.songsModel.addSong(song);
         this.updateAllSongs();
     }
+
+    public deleteSongIndex(index:number):void{
+        this.songsModel.deleteSongIndex(index);
+        this.updateAllSongs();
+    }
+
+    public updateSongIndex<K extends keyof Song>(index:number,attribute:K,value:Song[K]){
+        this.songsModel.updateSongIndex(index,attribute,value);
+        this.updateAllSongs();
+    }
 }
 
 export const controller = new Controller();

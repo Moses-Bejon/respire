@@ -33,6 +33,22 @@ export function SongInput() {
         reader.readAsDataURL(source);
     }
 
+    const deleteSongIndex = (index:number):void => {
+        setUploads((prevState) => {
+            const newSongs = [...prevState];
+            newSongs.splice(index,1);
+            return newSongs;
+        })
+    }
+
+    const updateSongIndex = <K extends keyof Song>(index:number,attribute:K,value:Song[K]):void => {
+        setUploads((prevState) => {
+            const newSongs = [...prevState];
+            newSongs[index][attribute] = value;
+            return newSongs;
+        })
+    }
+
     const sendToController = ():void => {
         for (const song of uploads){
             controller.uploadNewSong(song);
@@ -66,7 +82,7 @@ export function SongInput() {
                 <p>Spotify upload option - Coming soon</p>
             )}
 
-            <SongsList songArray={uploads} />
+            <SongsList songArray={uploads} deleteSongIndex={deleteSongIndex} updateSongIndex={updateSongIndex}/>
 
             <button onClick={sendToController}>Upload</button>
 

@@ -23,6 +23,16 @@ export class SongsModel{
         this.songProbabilities.push(1);
     }
 
+    public deleteSongIndex(index:number):void{
+        this.songs.splice(index,1);
+        this.numberOfSongs --;
+        this.songProbabilities.splice(index,1);
+    }
+
+    public updateSongIndex<K extends keyof Song>(index:number,attribute:K,value:Song[K]):void{
+        this.songs[index][attribute] = value;
+    }
+
     public pickSong(antiRepetitionBias:number):Song{
 
         // if no songs are uploaded

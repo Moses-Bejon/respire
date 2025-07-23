@@ -17,7 +17,11 @@ export function Curator() {
             <h1>Songs to upload:</h1>
             <SongInput />
             <h1>Songs uploaded:</h1>
-            <SongsList songArray={songList} />
+            <SongsList
+                songArray={songList}
+                deleteSongIndex={controller.deleteSongIndex.bind(controller)}
+                updateSongIndex={controller.updateSongIndex.bind(controller)}
+            />
         </>
     )
 }
