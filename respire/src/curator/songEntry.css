@@ -4,6 +4,10 @@
     flex-direction: row;
 }
 
+.songEntry:hover {
+    background-color: gray;
+}
+
 .songEntry > img {
     cursor: pointer;
 }

@@ -1,4 +1,5 @@
 import {type DragEvent} from "react";
+import "./fileInput.css";
 
 export function FileInput(
     {uploadName,fileUploadCallback,accept}:
@@ -51,8 +52,9 @@ export function FileInput(
     }
 
     return (
-        <button onClick={handleFileSelect} onDragOver={handleDragOver} onDrop={handleDrop}>
-            Upload {uploadName} (drag and drop or click me)
-        </button>
+        <div className={"fileInput"} onClick={handleFileSelect} onDragOver={handleDragOver} onDrop={handleDrop}>
+            <img src={"public/icons/file.svg"} alt={"upload file image"}/>
+            Drag and drop {uploadName} file(s) here, or click me
+        </div>
     );
 }

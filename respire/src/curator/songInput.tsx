@@ -4,6 +4,7 @@ import type {Song} from '../customTypes.ts';
 import {SongsList} from "./songsList.tsx";
 import {getUniqueStringWithPrefix} from "../lib/strings.ts";
 import {controller} from "../controller.ts";
+import "./songInput.css";
 
 export function SongInput() {
     const [selectedSource, setSelectedSource] = useState<'local' | 'youtube' | 'spotify'>('local');
@@ -59,18 +60,24 @@ export function SongInput() {
 
     return (
         <div className="songInput">
+
+            <SongsList songArray={uploads} deleteSongIndex={deleteSongIndex} updateSongAtIndex={updateSongAtIndex}/>
+
+            <br />
+
+            Upload from:
             <select
                 value={selectedSource}
                 onChange={(e) => setSelectedSource(e.target.value as 'local' | 'youtube' | 'spotify')}
             >
-                <option value="local">Upload from Computer</option>
-                <option value="youtube">Upload from YouTube</option>
-                <option value="spotify">Upload from Spotify</option>
+                <option value="local">Computer</option>
+                <option value="youtube">YouTube</option>
+                <option value="spotify">Spotify</option>
             </select>
 
             {selectedSource === 'local' && (
                 <FileInput
-                    uploadName="audio file"
+                    uploadName="audio"
                     fileUploadCallback={uploadLocal}
                     accept="audio/*"
                 />
@@ -81,8 +88,6 @@ export function SongInput() {
             {selectedSource === 'spotify' && (
                 <p>Spotify upload option - Coming soon</p>
             )}
-
-            <SongsList songArray={uploads} deleteSongIndex={deleteSongIndex} updateSongAtIndex={updateSongAtIndex}/>
 
             <button onClick={sendToController}>Upload</button>
 

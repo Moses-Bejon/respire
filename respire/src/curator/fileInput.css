@@ -1,0 +1,22 @@
+.fileInput {
+    border: lightgray dashed 3px;
+    box-sizing: border-box;
+
+    width: 98%;
+    margin: 1%;
+
+    height: 40vh;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: blue;
+    text-decoration: underline;
+}
+
+.fileInput > img{
+    width: 20%;
+    height: 20%;
+    object-fit: contain;
+}

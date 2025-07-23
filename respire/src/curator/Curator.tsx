@@ -3,6 +3,7 @@ import {SongsList} from "./songsList.tsx";
 import type {Song} from "../customTypes.ts";
 import {useState,useEffect} from "react";
 import {SongInput} from "./songInput.tsx";
+import "./curator.css";
 
 export function Curator() {
 
@@ -13,7 +14,7 @@ export function Curator() {
     }, []);
 
     return (
-        <>
+        <div className={"curator"}>
             <h1>Songs to upload:</h1>
             <SongInput />
             <h1>Songs uploaded:</h1>
@@ -22,6 +23,6 @@ export function Curator() {
                 deleteSongIndex={controller.deleteSongIndex.bind(controller)}
                 updateSongAtIndex={controller.updateSongAtIndex.bind(controller)}
             />
-        </>
+        </div>
     )
 }
