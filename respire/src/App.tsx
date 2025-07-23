@@ -16,6 +16,13 @@ function Navigation() {
 }
 
 export function App(): ReactElement {
+
+    // Check for redirected route
+    const redirectPath = new URLSearchParams(window.location.search).get("redirect");
+    if (redirectPath && window.location.pathname === "/respire/index.html") {
+        window.history.replaceState(null, "", redirectPath);
+    }
+
     return (
         <Router basename="/respire">
             <Navigation/>
