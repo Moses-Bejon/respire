@@ -23,3 +23,21 @@ nav {
 .selected {
   background-color: gray;
 }
+
+.buttons{
+  display: flex;
+  flex-direction: row;
+
+  height: 50px;
+}
+
+.buttons > *{
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.buttons > button{
+  border: none;
+  font-size: inherit;
+  border-radius: 10px;
+}

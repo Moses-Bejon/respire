@@ -1,0 +1,11 @@
+.playBar {
+    width: 100%;
+    height: 2vh;
+    background-color: darkgray;
+    cursor: pointer;
+}
+
+.playBarProgress {
+    background-color: gray;
+    height: 100%;
+}

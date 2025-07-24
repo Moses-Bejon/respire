@@ -10,7 +10,7 @@ export function SongEntry({song, deleteCallback, updateAttributeCallback}:
 
     return (
         <div className="songEntry">
-            <img src={"icons/trash.svg"} alt={"delete button"} onClick={deleteCallback} />
+            <img src={"icons/trash.svg"} alt={"delete button"} onPointerDown={deleteCallback} />
             <input value={song.title} onChange={
                 (event) => {
                     updateAttributeCallback("title",event.target.value);

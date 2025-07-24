@@ -24,11 +24,11 @@ export function App(): ReactElement {
     }
 
     return (
-        <Router basename="/respire">
+        <Router basename="/respire/">
             <Navigation/>
             <Routes>
-                <Route path="/" element={< Player />}/>
-                <Route path="/curate" element={< Curator />}/>
+                <Route path="" element={< Player />}/>
+                <Route path="curate" element={< Curator />}/>
             </Routes>
         </Router>
     );

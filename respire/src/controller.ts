@@ -5,9 +5,11 @@ class Controller{
     private readonly antiRepetitionBias: number;
     private readonly currentSongSubscribers: Set<(song: Song) => void>;
     private readonly allSongsSubscribers: Set<(songs: Song[]) => void>;
+    private readonly playingSubscribers: Set<(playing: boolean) => void>;
     private songsModel: SongsModel;
     private currentSong: Song;
     private readonly audioSource: HTMLAudioElement;
+    private isPlaying: boolean = false;
 
     constructor() {
 
@@ -22,10 +24,60 @@ class Controller{
             this.requestNewSong();
         });
 
-        this.audioSource.play();
+        this.play();
 
         this.currentSongSubscribers = new Set();
         this.allSongsSubscribers = new Set();
+        this.playingSubscribers = new Set();
+    }
+
+    public play():void{
+        this.audioSource.play().then(
+            () => {
+                this.isPlaying = true;
+                this.updatePlaying();
+            }
+        ).catch(() => {
+            this.isPlaying = false;
+            this.updatePlaying();
+        });
+    }
+
+    public pause():void{
+        this.audioSource.pause();
+        this.isPlaying = false;
+        this.updatePlaying();
+    }
+
+    public currentlyPlaying():boolean{
+        return this.isPlaying;
+    }
+
+    public subscribeToPlaying(setPlaying: (playing: boolean) => void):() => void{
+        this.playingSubscribers.add(setPlaying);
+        setPlaying(this.isPlaying);
+
+        return () => {
+            this.playingSubscribers.delete(setPlaying);
+        };
+    }
+
+    private updatePlaying():void{
+        for (const subscriber of this.playingSubscribers){
+            subscriber(this.isPlaying);
+        }
+    }
+
+    public getTimestamp():number{
+        return this.audioSource.currentTime;
+    }
+
+    public getDuration():number{
+        return this.audioSource.duration;
+    }
+
+    public seekTo(timestamp:number):void{
+        this.audioSource.currentTime = timestamp;
     }
 
     public subscribeToCurrentSong(setSong: (song: Song) => void):() => void{
@@ -58,7 +110,7 @@ class Controller{
         this.currentSong = this.songsModel.pickSong(this.antiRepetitionBias);
 
         this.audioSource.src = this.currentSong.source;
-        this.audioSource.play();
+        this.play()
 
         for (const subscriber of this.currentSongSubscribers){
             subscriber(this.currentSong)

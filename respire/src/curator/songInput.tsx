@@ -107,8 +107,8 @@ export function SongInput() {
             <SongsList songArray={uploads} deleteSongIndex={deleteSongIndex} updateSongAtIndex={updateSongAtIndex}/>
 
             <div className={"buttons"}>
-                <button className={"finishUploadButton"} onClick={sendToController}>Finish upload</button>
-                <button className={"clearButton"} onClick={() => setUploads([])}>Clear</button>
+                <button className={"finishUploadButton"} onPointerDown={sendToController}>Finish upload</button>
+                <button className={"clearButton"} onPointerDown={() => setUploads([])}>Clear</button>
             </div>
 
         </div>
