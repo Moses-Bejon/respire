@@ -37,7 +37,13 @@ export function Player(){
         return () => document.removeEventListener("keydown",handleKeyDown);
     }, []);
 
-    return (
+    return song === threeSecondSilence ? (
+        <div className={"player"}>
+            <p>
+                Upload some songs in the curator tab in order to play them
+            </p>
+        </div>
+    ) : (
         <div className={"player"}>
             <h1>{song.title}</h1>
             <img
