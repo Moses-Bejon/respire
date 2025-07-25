@@ -1,5 +1,5 @@
 import {type Song} from "./customTypes.ts";
-import {threeSecondSilence} from "../public/silence.ts";
+import {threeSecondSilence} from "./silence.ts";
 import {getUniqueStringWithPrefix} from "./lib/strings.ts";
 
 export class SongsModel{

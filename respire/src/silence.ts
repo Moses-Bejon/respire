@@ -1,4 +1,4 @@
-import {type Song} from "../src/customTypes.ts";
+import {type Song} from "./customTypes.ts";
 
 export const threeSecondSilence:Song = {
     title:"No song to display",
