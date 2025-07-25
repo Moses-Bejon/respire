@@ -38,9 +38,19 @@ class Controller{
     public play():void{
         if (this.currentMode === "youtube"){
             window.youtubePlayer.playVideo();
+
+            if (!this.audioSource.paused){
+                this.audioSource.pause();
+            }
+
             this.isPlaying = true;
             this.updatePlaying();
         } else {
+
+            if (window.youtubePlayer.getPlayerState !== undefined && [BUFFERING,PLAYING].includes(window.youtubePlayer.getPlayerState())){
+                window.youtubePlayer.stopVideo();
+            }
+
             this.audioSource.play().then(
                 () => {
                     this.isPlaying = true;
