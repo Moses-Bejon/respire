@@ -56,9 +56,16 @@ class Controller{
                     this.isPlaying = true;
                     this.updatePlaying();
                 }
-            ).catch(() => {
+            ).catch((error) => {
                 this.isPlaying = false;
                 this.updatePlaying();
+
+                // if autoplay disabled, wait for user interaction before autoplaying
+                if (error.name === "NotAllowedError"){
+                    document.addEventListener("click",() => {
+                        this.play();
+                    }, {once: true})
+                }
             });
         }
     }
