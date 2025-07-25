@@ -36,8 +36,9 @@ nav {
   cursor: pointer;
 }
 
-.buttons > button{
+button {
   border: none;
   font-size: inherit;
   border-radius: 10px;
+  cursor: pointer;
 }

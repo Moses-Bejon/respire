@@ -20,3 +20,8 @@ body {
 
   background: linear-gradient(to bottom, #111111, #000000) fixed;
 }
+
+/*We want to hear the music from the youtube iframe, but not see it*/
+#youtubePlayer{
+  display: none;
+}

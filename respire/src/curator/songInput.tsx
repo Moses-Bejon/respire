@@ -39,6 +39,29 @@ export function SongInput() {
         reader.readAsDataURL(source);
     }
 
+    const [youtubeUrl,setYoutubeUrl] = useState<string>('');
+
+    const uploadYoutube = ():void => {
+
+        const source = new URL(youtubeUrl).searchParams.get("v") as string
+
+        if (source === null){
+            console.error("Could not find video ID in URL: ",youtubeUrl);
+            window.alert("Could not find video ID in URL, we do not support youtube shorts. Check the URL entered matches the example: https://www.youtube.com/watch?v=dQw4w9WgXcQ.");
+            return;
+        }
+
+        setUploads(prevState => {
+            const newSong: Song = {
+                title: getUniqueStringWithPrefix("youtube upload",prevState.map((song) => song.title)),
+                sourceFormat: "youtube",
+                source: source
+            };
+
+            return [...prevState, newSong];
+        })
+    }
+
     const deleteSongIndex = (index:number):void => {
         setUploads((prevState) => {
             const newSongs = [...prevState];
@@ -90,6 +113,9 @@ export function SongInput() {
                 <option value="spotify">Spotify</option>
             </select>
 
+            <br />
+            <br />
+
             {selectedSource === 'local' && (
                 <FileInput
                     uploadName="audio"
@@ -98,11 +124,22 @@ export function SongInput() {
                 />
             )}
             {selectedSource === 'youtube' && (
-                <p>YouTube upload option - Coming soon</p>
+                <div className={"youtubeInput"}>
+                    <input
+                        type="text"
+                        value={youtubeUrl}
+                        placeholder="YouTube URL (e.g. https://www.youtube.com/watch?v=dQw4w9WgXcQ)"
+                        onChange={(e) => setYoutubeUrl(e.target.value)}
+                    />
+                    <button onClick={uploadYoutube}>Find song at URL</button>
+                </div>
             )}
             {selectedSource === 'spotify' && (
                 <p>Spotify upload option - Coming soon</p>
             )}
+
+            <br />
+            <br />
 
             <SongsList songArray={uploads} deleteSongIndex={deleteSongIndex} updateSongAtIndex={updateSongAtIndex}/>
 

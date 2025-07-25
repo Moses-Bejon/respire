@@ -1,6 +1,9 @@
 import {SongsModel} from "./songsModel.ts";
 import {type Song} from "./customTypes.ts";
 
+// for the youtube player API:
+const [UNSTARTED, ENDED, PLAYING, PAUSED, BUFFERING] = [-1,0,1,2,3]
+
 class Controller{
     private readonly antiRepetitionBias: number;
     private readonly currentSongSubscribers: Set<(song: Song) => void>;
@@ -10,6 +13,7 @@ class Controller{
     private currentSong: Song;
     private readonly audioSource: HTMLAudioElement;
     private isPlaying: boolean = false;
+    private currentMode: "local" | "youtube" = "local";
 
     constructor() {
 
@@ -32,19 +36,29 @@ class Controller{
     }
 
     public play():void{
-        this.audioSource.play().then(
-            () => {
-                this.isPlaying = true;
-                this.updatePlaying();
-            }
-        ).catch(() => {
-            this.isPlaying = false;
+        if (this.currentMode === "youtube"){
+            window.youtubePlayer.playVideo();
+            this.isPlaying = true;
             this.updatePlaying();
-        });
+        } else {
+            this.audioSource.play().then(
+                () => {
+                    this.isPlaying = true;
+                    this.updatePlaying();
+                }
+            ).catch(() => {
+                this.isPlaying = false;
+                this.updatePlaying();
+            });
+        }
     }
 
     public pause():void{
-        this.audioSource.pause();
+        if (this.currentMode === "youtube"){
+            window.youtubePlayer.pauseVideo();
+        } else {
+            this.audioSource.pause();
+        }
         this.isPlaying = false;
         this.updatePlaying();
     }
@@ -69,15 +83,27 @@ class Controller{
     }
 
     public getTimestamp():number{
-        return this.audioSource.currentTime;
+        if (this.currentMode === "youtube"){
+            return window.youtubePlayer.getCurrentTime();
+        } else {
+            return this.audioSource.currentTime;
+        }
     }
 
     public getDuration():number{
-        return this.audioSource.duration;
+        if (this.currentMode === "youtube"){
+            return window.youtubePlayer.getDuration();
+        } else {
+            return this.audioSource.duration;
+        }
     }
 
     public seekTo(timestamp:number):void{
-        this.audioSource.currentTime = timestamp;
+        if (this.currentMode === "youtube"){
+            window.youtubePlayer.seekTo(timestamp,true);
+        } else {
+            this.audioSource.currentTime = timestamp;
+        }
     }
 
     public subscribeToCurrentSong(setSong: (song: Song) => void):() => void{
@@ -109,7 +135,14 @@ class Controller{
 
         this.currentSong = this.songsModel.pickSong(this.antiRepetitionBias);
 
-        this.audioSource.src = this.currentSong.source;
+        if (this.currentSong.sourceFormat === "local") {
+            this.audioSource.src = this.currentSong.source;
+            this.currentMode = "local";
+        } else {
+            window.youtubePlayer.loadVideoById(this.currentSong.source);
+            this.currentMode = "youtube";
+        }
+
         this.play()
 
         for (const subscriber of this.currentSongSubscribers){
@@ -131,8 +164,36 @@ class Controller{
         this.songsModel.updateSongAtIndex(index,attribute,value);
         this.updateAllSongs();
     }
+
+    // this function essentially ensures that the youtube player's state aligns with the controller's
+    public youtubePlayerChangedState(state:number):void{
+        if (this.currentMode !== "youtube"){
+            if ([PLAYING,BUFFERING].includes(state)){
+                window.youtubePlayer.stopVideo();
+            }
+            return;
+        }
+
+        if (this.isPlaying){
+            if ([PAUSED,UNSTARTED].includes(state)){
+                window.youtubePlayer.playVideo();
+            }
+            if (state === BUFFERING){
+                // TODO: tell the user it's buffering
+            }
+        } else {
+            if ([PLAYING,BUFFERING].includes(state)){
+                window.youtubePlayer.pauseVideo();
+            }
+        }
+
+        if (state === ENDED){
+            this.requestNewSong();
+        }
+    }
 }
 
 export const controller = new Controller();
+window.youtubePlayerSubscribers.add(controller.youtubePlayerChangedState.bind(controller));
 
 console.log(controller);
