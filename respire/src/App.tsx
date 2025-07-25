@@ -8,7 +8,7 @@ function Navigation() {
     const location = useLocation();
     return (
         <nav>
-            <Link className={`play link ${location.pathname === "/" ? "selected" : ""}`} to="/">Play</Link>
+            <Link className={`play link ${location.pathname === "/" ? "selected" : ""}`} to="/">Listen</Link>
             <Link className={`curate link ${location.pathname === "/curate" ? "selected" : ""}`}
                   to="/curate">Curate</Link>
         </nav>
