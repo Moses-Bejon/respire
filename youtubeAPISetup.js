@@ -29,7 +29,18 @@ function onYouTubeIframeAPIReady() {
             },
             'onStateChange': (event) => {
                 console.log("THE OG STATE: ",event.data)
+                for (const subscriber of window.infoGrabberSubscribers){
+                    subscriber.onStateChange(event.data)
+                }
+            },
+            'onError': (event) => {
+                console.log("ERROR: ",event.data)
+                for (const subscriber of window.infoGrabberSubscribers){
+                    subscriber.onError(event.data)
+                }
             }
         }
     });
 }
+
+window.infoGrabberSubscribers = new Set()
