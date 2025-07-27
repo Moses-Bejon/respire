@@ -15,15 +15,17 @@ function onYouTubeIframeAPIReady() {
         videoId: 'dQw4w9WgXcQ',
         playerVars: {
             'playsinline': 1
-        },
-        events: {
-            onStateChange: () => {
-                for (const subscriber of window.youtubePlayerSubscribers){
-                    subscriber(window.youtubePlayer.getPlayerState());
-                }
+        }
+    });
+
+    window.youtubeInfoGrabber = new YT.Player('youtubeInfoGrabber', {
+        height: '390',
+        width: '640',
+        videoId: 'dQw4w9WgXcQ',
+        events:{
+            'onReady': () => {
+                window.youtubeInfoGrabber.mute()
             }
         }
     });
 }
-
-window.youtubePlayerSubscribers = new Set()
