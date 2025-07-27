@@ -25,6 +25,9 @@ function onYouTubeIframeAPIReady() {
         events:{
             'onReady': () => {
                 window.youtubeInfoGrabber.mute()
+            },
+            'onStateChange': (event) => {
+                console.log("THE OG STATE: ",event.data)
             }
         }
     });
