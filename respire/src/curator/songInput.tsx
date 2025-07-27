@@ -47,6 +47,10 @@ export function SongInput() {
         let source: string;
         try {
             source = new URL(youtubeUrl).searchParams.get("v") as string
+
+            if (source === null){
+                source = new URL(youtubeUrl).pathname.split('/').pop() as string;
+            }
         } catch (error) {
             console.error("Could not parse URL: ",youtubeUrl);
             window.alert("Could not parse URL, check the URL entered matches the example: https://www.youtube.com/watch?v=dQw4w9WgXcQ.");
@@ -55,7 +59,7 @@ export function SongInput() {
 
         if (source === null){
             console.error("Could not find video ID in URL: ",youtubeUrl);
-            window.alert("Could not find video ID in URL, we do not support youtube shorts. Check the URL entered matches the example: https://www.youtube.com/watch?v=dQw4w9WgXcQ.");
+            window.alert("Could not find video ID in URL. Check the URL entered matches the example: https://www.youtube.com/watch?v=dQw4w9WgXcQ.");
             return;
         }
 
