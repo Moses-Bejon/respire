@@ -15,15 +15,6 @@ function onYouTubeIframeAPIReady() {
         videoId: 'dQw4w9WgXcQ',
         playerVars: {
             'playsinline': 1
-        },
-        events: {
-            onStateChange: () => {
-                for (const subscriber of window.youtubePlayerSubscribers){
-                    subscriber(window.youtubePlayer.getPlayerState());
-                }
-            }
         }
     });
 }
-
-window.youtubePlayerSubscribers = new Set()

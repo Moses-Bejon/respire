@@ -183,34 +183,36 @@ class Controller{
     }
 
     // this function essentially ensures that the youtube player's state aligns with the controller's
-    public youtubePlayerChangedState(state:number):void{
+    public youtubePlayerChangedState(state:{target:any,data:number}):void{
+        console.log("youtube player state changed to",state);
+
         if (this.currentMode !== "youtube"){
-            if ([PLAYING,BUFFERING].includes(state)){
+            if ([PLAYING,BUFFERING].includes(state.data)){
                 window.youtubePlayer.stopVideo();
             }
             return;
         }
 
         if (this.isPlaying){
-            if ([PAUSED,UNSTARTED].includes(state)){
+            if ([PAUSED,UNSTARTED].includes(state.data)){
                 window.youtubePlayer.playVideo();
             }
-            if (state === BUFFERING){
+            if (state.data === BUFFERING){
                 // TODO: tell the user it's buffering
             }
         } else {
-            if ([PLAYING,BUFFERING].includes(state)){
+            if ([PLAYING,BUFFERING].includes(state.data)){
                 window.youtubePlayer.pauseVideo();
             }
         }
 
-        if (state === ENDED){
+        if (state.data === ENDED){
             this.requestNewSong();
         }
     }
 }
 
 export const controller = new Controller();
-window.youtubePlayerSubscribers.add(controller.youtubePlayerChangedState.bind(controller));
+window.youtubePlayer.addEventListener("onStateChange",controller.youtubePlayerChangedState.bind(controller));
 
 console.log(controller);
