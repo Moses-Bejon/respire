@@ -2,7 +2,7 @@ import {SongsModel} from "./songsModel.ts";
 import {type Song} from "./customTypes.ts";
 
 // for the youtube player API:
-const [UNSTARTED, ENDED, PLAYING, PAUSED, BUFFERING] = [-1,0,1,2,3]
+const [UNSTARTED, ENDED, PLAYING, PAUSED, BUFFERING,CUED] = [-1,0,1,2,3,5]
 
 class Controller{
     private readonly antiRepetitionBias: number;
@@ -46,7 +46,6 @@ class Controller{
             this.isPlaying = true;
             this.updatePlaying();
         } else {
-
             if (window.youtubePlayer.getPlayerState !== undefined && [BUFFERING,PLAYING].includes(window.youtubePlayer.getPlayerState())){
                 window.youtubePlayer.stopVideo();
             }
@@ -184,8 +183,6 @@ class Controller{
 
     // this function essentially ensures that the youtube player's state aligns with the controller's
     public youtubePlayerChangedState(state:{target:any,data:number}):void{
-        console.log("youtube player state changed to",state);
-
         if (this.currentMode !== "youtube"){
             if ([PLAYING,BUFFERING].includes(state.data)){
                 window.youtubePlayer.stopVideo();
@@ -194,7 +191,7 @@ class Controller{
         }
 
         if (this.isPlaying){
-            if ([PAUSED,UNSTARTED].includes(state.data)){
+            if ([PAUSED,UNSTARTED,CUED].includes(state.data)){
                 window.youtubePlayer.playVideo();
             }
             if (state.data === BUFFERING){

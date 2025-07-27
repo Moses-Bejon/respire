@@ -40,10 +40,18 @@ export function SongInput() {
     }
 
     const [youtubeUrl,setYoutubeUrl] = useState<string>('');
+    const lastSource = useRef<string>('');
 
     const uploadYoutube = ():void => {
 
-        const source = new URL(youtubeUrl).searchParams.get("v") as string
+        let source: string;
+        try {
+            source = new URL(youtubeUrl).searchParams.get("v") as string
+        } catch (error) {
+            console.error("Could not parse URL: ",youtubeUrl);
+            window.alert("Could not parse URL, check the URL entered matches the example: https://www.youtube.com/watch?v=dQw4w9WgXcQ.");
+            return;
+        }
 
         if (source === null){
             console.error("Could not find video ID in URL: ",youtubeUrl);
@@ -51,16 +59,67 @@ export function SongInput() {
             return;
         }
 
-        setUploads(prevState => {
-            const newSong: Song = {
-                title: getUniqueStringWithPrefix("youtube upload",prevState.map((song) => song.title)),
-                sourceFormat: "youtube",
-                source: source
-            };
+        window.youtubeInfoGrabber.cueVideoById(source);
 
-            return [...prevState, newSong];
+        // the rest of the upload will be processed by event listeners, waiting for the player to load the video
+        lastSource.current = source;
+    }
+
+    const handleYoutubeStateChange = (state:{target:any,data:number}):void => {
+
+        setUploads(prevState => {
+
+            // if the state is cued then we can read the title, hence we wait for 5 meaning cued
+            // we also check that the source is not the source of a different upload
+            // (we don't want to upload the same song twice)
+            if (state.data === 5 && !(prevState.map(upload => upload.source)).includes(lastSource.current)){
+                const newSong: Song = {
+                    title: getUniqueStringWithPrefix(
+                        window.youtubeInfoGrabber.videoTitle,
+                        prevState.map((song) => song.title)
+                    ),
+                    sourceFormat: "youtube",
+                    source: lastSource.current as string
+                };
+
+                return [...prevState, newSong];
+            } else {
+                return prevState;
+            }
         })
     }
+
+    const handleYoutubeError = (error:{target:any,data:number}):void => {
+        console.error("Could not find video with URL. Youtube error code: ",error.data);
+        window.alert("The URL entered is valid but we could not find the video. Ensure the video is not private, unlisted, or been deleted.");
+    }
+
+    const youtubeReady = useRef(false);
+
+    const attachYoutubeListeners = () => {
+        window.youtubeInfoGrabber.addEventListener("onStateChange", handleYoutubeStateChange);
+        window.youtubeInfoGrabber.addEventListener("onError", handleYoutubeError);
+    };
+
+    useEffect(() => {
+        const handleYoutubeReady = () => {
+            youtubeReady.current = true;
+            attachYoutubeListeners();
+        };
+
+        if (window.youtubeInfoGrabber?.getPlayerState) {
+            handleYoutubeReady();
+        } else {
+            window.youtubeInfoGrabber.addEventListener("onReady", handleYoutubeReady,{once:true});
+        }
+
+        return () => {
+            if (youtubeReady.current) {
+                window.youtubeInfoGrabber.removeEventListener("onStateChange", handleYoutubeStateChange);
+                window.youtubeInfoGrabber.removeEventListener("onError", handleYoutubeError);
+            }
+        }
+    }, [youtubeReady]);
 
     const deleteSongIndex = (index:number):void => {
         setUploads((prevState) => {

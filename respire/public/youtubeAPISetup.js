@@ -17,4 +17,15 @@ function onYouTubeIframeAPIReady() {
             'playsinline': 1
         }
     });
+
+    window.youtubeInfoGrabber = new YT.Player('youtubeInfoGrabber', {
+        height: '390',
+        width: '640',
+        videoId: 'dQw4w9WgXcQ',
+        events:{
+            'onReady': () => {
+                window.youtubeInfoGrabber.mute()
+            }
+        }
+    });
 }
