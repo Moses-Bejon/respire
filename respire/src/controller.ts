@@ -213,7 +213,7 @@ export const controller = new Controller();
 window.playerSubscribers.add(
     {
         "onStateChange": controller.youtubePlayerChangedState.bind(controller),
-        "onError": () => {}
+        "onError": () => {// TODO: handle errors}
     }
 );
 window.youtubePlayer.addEventListener("onStateChange",controller.youtubePlayerChangedState.bind(controller));
