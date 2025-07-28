@@ -25,7 +25,19 @@ function onYouTubeIframeAPIReady() {
         events:{
             'onReady': () => {
                 window.youtubeInfoGrabber.mute()
+            },
+            'onStateChange': (event) => {
+                for (const subscriber of window.infoGrabberSubscribers){
+                    subscriber.onStateChange(event.data)
+                }
+            },
+            'onError': (event) => {
+                for (const subscriber of window.infoGrabberSubscribers){
+                    subscriber.onError(event.data)
+                }
             }
         }
     });
 }
+
+window.infoGrabberSubscribers = new Set()

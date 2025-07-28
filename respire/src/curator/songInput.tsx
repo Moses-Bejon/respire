@@ -69,14 +69,14 @@ export function SongInput() {
         lastSource.current = source;
     }
 
-    const handleYoutubeStateChange = (state:{target:any,data:number}):void => {
+    const handleYoutubeStateChange = (state:number):void => {
 
         setUploads(prevState => {
 
             // if the state is cued then we can read the title, hence we wait for 5 meaning cued
             // we also check that the source is not the source of a different upload
             // (we don't want to upload the same song twice)
-            if (state.data === 5 && !(prevState.map(upload => upload.source)).includes(lastSource.current)){
+            if (state === 5 && !(prevState.map(upload => upload.source)).includes(lastSource.current)){
                 const newSong: Song = {
                     title: getUniqueStringWithPrefix(
                         window.youtubeInfoGrabber.videoTitle,
@@ -93,37 +93,21 @@ export function SongInput() {
         })
     }
 
-    const handleYoutubeError = (error:{target:any,data:number}):void => {
-        console.error("Could not find video with URL. Youtube error code: ",error.data);
+    const handleYoutubeError = (error:number):void => {
+        console.error("Could not find video with URL. Youtube error code: ",error);
         window.alert("The URL entered is valid but we could not find the video. Ensure the video is not private, unlisted, or been deleted.");
     }
 
-    const youtubeReady = useRef(false);
-
-    const attachYoutubeListeners = () => {
-        window.youtubeInfoGrabber.addEventListener("onStateChange", handleYoutubeStateChange);
-        window.youtubeInfoGrabber.addEventListener("onError", handleYoutubeError);
-    };
-
     useEffect(() => {
-        const handleYoutubeReady = () => {
-            youtubeReady.current = true;
-            attachYoutubeListeners();
-        };
 
-        if (window.youtubeInfoGrabber?.getPlayerState) {
-            handleYoutubeReady();
-        } else {
-            window.youtubeInfoGrabber.addEventListener("onReady", handleYoutubeReady,{once:true});
-        }
+        const subscriber = {"onError": handleYoutubeError, "onStateChange": handleYoutubeStateChange};
+
+        window.infoGrabberSubscribers.add(subscriber);
 
         return () => {
-            if (youtubeReady.current) {
-                window.youtubeInfoGrabber.removeEventListener("onStateChange", handleYoutubeStateChange);
-                window.youtubeInfoGrabber.removeEventListener("onError", handleYoutubeError);
-            }
+            window.infoGrabberSubscribers.delete(subscriber);
         }
-    }, [youtubeReady]);
+    }, []);
 
     const deleteSongIndex = (index:number):void => {
         setUploads((prevState) => {
