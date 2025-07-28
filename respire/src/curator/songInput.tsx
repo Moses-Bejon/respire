@@ -1,19 +1,34 @@
 import {useState,useEffect,useRef} from 'react';
 import {FileInput} from './fileInput';
-import type {Song} from '../customTypes.ts';
+import type {Song, sourceFormat} from '../customTypes.ts';
 import {SongsList} from "./songsList.tsx";
 import {getUniqueStringWithPrefix} from "../lib/strings.ts";
 import {controller} from "../controller.ts";
 import "./songInput.css";
 
 export function SongInput() {
-    const [selectedSource, setSelectedSource] = useState<'local' | 'youtube' | 'spotify'>('local');
+    const [selectedSource, setSelectedSource] = useState<sourceFormat>('local');
     const [uploads, setUploads] = useState<Song[]>([]);
     const uploadsRef = useRef(uploads);
 
     useEffect(() => {
         uploadsRef.current = uploads;
     },[uploads]);
+
+    const getNewUploads = (
+        title:string,
+        sourceFormat:sourceFormat,
+        source:string,
+        currentUploads:Song[]
+    ):Song[] => {
+        const newSong = {
+            title: getUniqueStringWithPrefix(title,currentUploads.map((song) => song.title)),
+            sourceFormat: sourceFormat,
+            source: source
+        };
+
+        return [...currentUploads, newSong];
+    }
 
     const uploadLocal = (source: File, title?: string):void => {
 
@@ -26,13 +41,7 @@ export function SongInput() {
 
         reader.onload = () => {
             setUploads(prevState => {
-                const newSong: Song = {
-                    title: getUniqueStringWithPrefix(title,prevState.map((song) => song.title)),
-                    sourceFormat: "local",
-                    source: reader.result as string
-                };
-
-                return [...prevState, newSong];
+                return getNewUploads(title, "local", reader.result as string, prevState);
             })
         }
 
@@ -40,10 +49,8 @@ export function SongInput() {
     }
 
     const [youtubeUrl,setYoutubeUrl] = useState<string>('');
-    const lastSource = useRef<string>('');
 
     const uploadYoutube = ():void => {
-
         let source: string;
         try {
             source = new URL(youtubeUrl).searchParams.get("v") as string
@@ -65,49 +72,111 @@ export function SongInput() {
 
         window.youtubeInfoGrabber.cueVideoById(source);
 
-        // the rest of the upload will be processed by event listeners, waiting for the player to load the video
-        lastSource.current = source;
-    }
-
-    const handleYoutubeStateChange = (state:number):void => {
-
-        setUploads(prevState => {
-
-            // if the state is cued then we can read the title, hence we wait for 5 meaning cued
-            // we also check that the source is not the source of a different upload
-            // (we don't want to upload the same song twice)
-            if (state === 5 && !(prevState.map(upload => upload.source)).includes(lastSource.current)){
-                const newSong: Song = {
-                    title: getUniqueStringWithPrefix(
-                        window.youtubeInfoGrabber.videoTitle,
-                        prevState.map((song) => song.title)
-                    ),
-                    sourceFormat: "youtube",
-                    source: lastSource.current as string
-                };
-
-                return [...prevState, newSong];
-            } else {
-                return prevState;
-            }
+        waitForState(-1).then(() => {
+            setUploads(prevState => {
+                return getNewUploads(window.youtubeInfoGrabber.videoTitle,"youtube",source,prevState);
+            })
+            setYoutubeUrl("");
+        }).catch((error) => {
+            console.error("Could not find video/playlist with URL. Youtube error code: ",error);
+            window.alert(`The URL entered is valid but we could not find the video. Ensure the video is not private, unlisted, or been mistyped.`);
         })
     }
 
-    const handleYoutubeError = (error:number):void => {
-        console.error("Could not find video with URL. Youtube error code: ",error);
-        window.alert("The URL entered is valid but we could not find the video. Ensure the video is not private, unlisted, or been deleted.");
+    const uploadYoutubePlaylist = async (): Promise<void> => {
+
+        let source: string;
+        try {
+            source = new URL(youtubeUrl).searchParams.get("list") as string;
+        } catch (error) {
+            console.error("Could not parse URL: ",youtubeUrl);
+            window.alert("Could not parse URL, check the URL entered matches the example: https://www.youtube.com/watch?v=KNZbaP3bhk0&list=PLU1XqNAUBP5XIc3y7DemzqmLXqvyH3f37.");
+            return;
+        }
+
+        if (source === null){
+            console.error("Could not find playlist ID in URL: ",youtubeUrl);
+            window.alert("Could not find playlist ID in URL. Check the URL entered matches the example: https://www.youtube.com/watch?v=KNZbaP3bhk0&list=PLU1XqNAUBP5XIc3y7DemzqmLXqvyH3f37. It should have 'list=PL' in it.");
+            return;
+        }
+
+        window.youtubeInfoGrabber.cuePlaylist({listType: "playlist", list: source});
+
+        try {
+            await waitForState(5);
+        } catch (error) {
+            console.error("Could not find playlist with URL: ",youtubeUrl);
+            window.alert(`The URL entered is valid but we could not find the playlist. Ensure the playlist is not private, unlisted, or been mistyped.
+If this is a personal playlist, procured by yourself, it is quite likely to be private. You can upload it by: 
+- Fist making it public, see: https://support.google.com/youtube/answer/3127309
+- Come back to the curate tab and click "find playlist at URL" again
+- Once it is successfully uploaded, you can safely make it private again`);
+            return;
+        }
+
+        let playlist = window.youtubeInfoGrabber.getPlaylist();
+        playlist = window.youtubeInfoGrabber.getPlaylist();
+
+        if (playlist === null){
+            console.error("Could not find playlist with URL: ",youtubeUrl);
+            window.alert(`Something went wrong while trying to find the playlist. You could try refreshing and trying again.`);
+            return;
+        }
+
+        if (playlist.length === 200){
+            window.alert("This playlist has more than 200 songs, which (for some reason) means YouTube will only fetch me the first 200 videos. There's probably a hacky way I can work around this, but for now I'm just going to upload the first 200 videos. Press the clear button if this is undesirable.");
+        }
+
+        for (let i = 0; i < playlist.length; i++){
+
+            setYoutubeUrl("");
+
+            window.youtubeInfoGrabber.cueVideoById(playlist[i]);
+
+            try {
+                await waitForState(5);
+            } catch (error) {
+                console.error(`Failed to wait for state on playlist item ${i}:`, error);
+                continue;
+            }
+
+            setUploads(prevState => {
+                return getNewUploads(window.youtubeInfoGrabber.videoTitle,"youtube",playlist[i],prevState);
+            })
+        }
     }
 
-    useEffect(() => {
+    const waitForState = (state:number):Promise<void> => {
 
-        const subscriber = {"onError": handleYoutubeError, "onStateChange": handleYoutubeStateChange};
+        return new Promise(
+            (resolve, reject) => {
 
-        window.infoGrabberSubscribers.add(subscriber);
+                let subscriber : {"onError": (errorCode:number) => void, "onStateChange": (newState:number) => void}
 
-        return () => {
-            window.infoGrabberSubscribers.delete(subscriber);
-        }
-    }, []);
+                const timeoutID = setTimeout(() => {
+                    window.infoGrabberSubscribers.delete(subscriber);
+                    reject("Timeout: State change did not occur within 1 second");
+                }, 1000);
+
+                subscriber = {
+                    "onError": (errorCode:number) => {
+                        window.infoGrabberSubscribers.delete(subscriber);
+                        clearTimeout(timeoutID);
+                        reject(errorCode);
+                    },
+                    "onStateChange": (newState:number) => {
+                        if (newState === state){
+                            window.infoGrabberSubscribers.delete(subscriber);
+                            clearTimeout(timeoutID);
+                            resolve();
+                        }
+                    }
+                };
+
+                window.infoGrabberSubscribers.add(subscriber);
+            }
+        )
+    }
 
     const deleteSongIndex = (index:number):void => {
         setUploads((prevState) => {
@@ -153,7 +222,7 @@ export function SongInput() {
             Upload from:
             <select
                 value={selectedSource}
-                onChange={(e) => setSelectedSource(e.target.value as 'local' | 'youtube' | 'spotify')}
+                onChange={(e) => setSelectedSource(e.target.value as sourceFormat)}
             >
                 <option value="local">Computer</option>
                 <option value="youtube">YouTube</option>
@@ -179,6 +248,7 @@ export function SongInput() {
                         onChange={(e) => setYoutubeUrl(e.target.value)}
                     />
                     <button onClick={uploadYoutube}>Find song at URL</button>
+                    <button onClick={uploadYoutubePlaylist}>Find playlist at URL</button>
                 </div>
             )}
             {selectedSource === 'spotify' && (

@@ -1,6 +1,8 @@
+export type sourceFormat = "local"|"youtube"|"spotify";
+
 export type Song = {
     title: string;
-    sourceFormat: "local"|"youtube"|"spotify";
+    sourceFormat: sourceFormat;
     source: string;
 };
 
