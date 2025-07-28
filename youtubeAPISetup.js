@@ -15,6 +15,18 @@ function onYouTubeIframeAPIReady() {
         videoId: 'dQw4w9WgXcQ',
         playerVars: {
             'playsinline': 1
+        },
+        events:{
+            'onStateChange': (event) => {
+                for (const subscriber of window.playerSubscribers){
+                    subscriber.onStateChange(event.data);
+                }
+            },
+            'onError': (event) => {
+                for (const subscriber of window.playerSubscribers){
+                    subscriber.onError(event.data);
+                }
+            },
         }
     });
 
@@ -25,7 +37,6 @@ function onYouTubeIframeAPIReady() {
         events:{
             'onReady': () => {
                 window.youtubeInfoGrabber.mute();
-                window.youtubeInfoGrabber.setLoop(true);
             },
             'onStateChange': (event) => {
                 for (const subscriber of window.infoGrabberSubscribers){
@@ -41,4 +52,5 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
+window.playerSubscribers = new Set();
 window.infoGrabberSubscribers = new Set();
