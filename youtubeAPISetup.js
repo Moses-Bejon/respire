@@ -25,16 +25,13 @@ function onYouTubeIframeAPIReady() {
         events:{
             'onReady': () => {
                 window.youtubeInfoGrabber.mute()
-                console.log("INFO GRABBER READY")
             },
             'onStateChange': (event) => {
-                console.log("THE OG STATE: ",event.data)
                 for (const subscriber of window.infoGrabberSubscribers){
                     subscriber.onStateChange(event.data)
                 }
             },
             'onError': (event) => {
-                console.log("ERROR: ",event.data)
                 for (const subscriber of window.infoGrabberSubscribers){
                     subscriber.onError(event.data)
                 }
