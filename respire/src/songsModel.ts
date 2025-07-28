@@ -46,7 +46,6 @@ export class SongsModel{
 
         // if no songs are uploaded
         if (this.numberOfSongs === 0){
-            console.error("No songs uploaded");
             return threeSecondSilence;
         }
 
