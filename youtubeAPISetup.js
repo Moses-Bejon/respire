@@ -24,20 +24,21 @@ function onYouTubeIframeAPIReady() {
         videoId: 'dQw4w9WgXcQ',
         events:{
             'onReady': () => {
-                window.youtubeInfoGrabber.mute()
+                window.youtubeInfoGrabber.mute();
+                window.youtubeInfoGrabber.setLoop(true);
             },
             'onStateChange': (event) => {
                 for (const subscriber of window.infoGrabberSubscribers){
-                    subscriber.onStateChange(event.data)
+                    subscriber.onStateChange(event.data);
                 }
             },
             'onError': (event) => {
                 for (const subscriber of window.infoGrabberSubscribers){
-                    subscriber.onError(event.data)
+                    subscriber.onError(event.data);
                 }
             }
         }
     });
 }
 
-window.infoGrabberSubscribers = new Set()
+window.infoGrabberSubscribers = new Set();
