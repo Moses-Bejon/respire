@@ -214,7 +214,7 @@ If this is a personal playlist, procured by yourself, it is quite likely to be p
                 }
             }
         }
-    },[])
+    },[]);
 
     return (
         <div className="songInput">
@@ -260,7 +260,7 @@ If this is a personal playlist, procured by yourself, it is quite likely to be p
 
             <SongsList songArray={uploads} deleteSongIndex={deleteSongIndex} updateSongAtIndex={updateSongAtIndex}/>
 
-            {uploads.length > 0 && <div className={"buttons"}>
+            {uploads.length > 0 && <div className="buttons">
                 <button className={"finishUploadButton"} onPointerDown={sendToController}>Finish upload</button>
                 <button className={"clearButton"} onPointerDown={() => setUploads([])}>Clear</button>
             </div>}

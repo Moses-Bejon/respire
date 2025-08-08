@@ -1,18 +1,18 @@
-.songEntry {
+.entry {
     display: flex;
     height: 50px;
     flex-direction: row;
 }
 
-.songEntry:hover {
-    background-color: gray;
+.entry:hover {
+    background-color: gray !important;
 }
 
-.songEntry > img {
+.entry > img {
     cursor: pointer;
 }
 
-.songEntry > input {
+.entry > input {
     flex: 1;
     background: transparent;
     border: none;

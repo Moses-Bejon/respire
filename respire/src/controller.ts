@@ -1,5 +1,7 @@
 import {SongsModel} from "./songsModel.ts";
-import {type Song} from "./customTypes.ts";
+import {type Song, type SongsFile} from "./customTypes.ts";
+import {FilesModel} from "./filesModel.ts";
+import {FILE_VERSION} from "./globalConstants.ts";
 
 // for the youtube player API:
 const [UNSTARTED, ENDED, PLAYING, PAUSED, BUFFERING,CUED] = [-1,0,1,2,3,5]
@@ -9,8 +11,12 @@ class Controller{
     private readonly currentSongSubscribers: Set<(song: Song) => void>;
     private readonly allSongsSubscribers: Set<(songs: Song[]) => void>;
     private readonly playingSubscribers: Set<(playing: boolean) => void>;
+    private readonly currentFileSubscribers: Set<(file:SongsFile)=>void>;
+    private readonly allFilesSubscribers: Set<(files:SongsFile[])=>void>;
+    private filesModel: FilesModel;
     private songsModel: SongsModel;
     private currentSong: Song;
+    private currentFile: SongsFile;
     private readonly audioSource: HTMLAudioElement;
     private isPlaying: boolean = false;
     private currentMode: "local" | "youtube" = "local";
@@ -19,7 +25,15 @@ class Controller{
 
         this.antiRepetitionBias = 1;
 
-        this.songsModel = new SongsModel();
+        this.filesModel = new FilesModel();
+        this.filesModel.addFile({
+            "name": "your songs",
+            "version": FILE_VERSION,
+            "songs": []
+        });
+
+        this.currentFile = this.filesModel.pickFile(0);
+        this.songsModel = new SongsModel(this.currentFile);
         this.currentSong = this.songsModel.pickSong(this.antiRepetitionBias);
 
         this.audioSource = new Audio(this.currentSong.source);
@@ -33,6 +47,8 @@ class Controller{
         this.currentSongSubscribers = new Set();
         this.allSongsSubscribers = new Set();
         this.playingSubscribers = new Set();
+        this.currentFileSubscribers = new Set();
+        this.allFilesSubscribers = new Set();
     }
 
     public play():void{
@@ -131,6 +147,28 @@ class Controller{
         };
     }
 
+    private updateCurrentSong():void{
+
+        if (this.currentSong.sourceFormat === "local") {
+            this.audioSource.src = this.currentSong.source;
+            this.currentMode = "local";
+        } else {
+            window.youtubePlayer.loadVideoById(this.currentSong.source);
+            this.currentMode = "youtube";
+        }
+
+        this.play()
+
+        for (const subscriber of this.currentSongSubscribers){
+            subscriber(this.currentSong);
+        }
+    }
+
+    public playSongAtIndex(index:number):void{
+        this.currentSong = this.songsModel.pickSongIndex(index,this.antiRepetitionBias);
+        this.updateCurrentSong();
+    }
+
     public subscribeToAllSongs(setSongs: (songs: Song[]) => void):() => void{
         this.allSongsSubscribers.add(setSongs);
         setSongs(this.songsModel.getSongs());
@@ -146,24 +184,55 @@ class Controller{
         }
     }
 
+    public subscribeToCurrentFile(setFile:(file:SongsFile)=>void):() => void{
+        setFile(this.currentFile);
+        this.currentFileSubscribers.add(setFile);
+        return () => {
+            this.currentFileSubscribers.delete(setFile);
+        }
+    }
+
+    private updateCurrentFile():void{
+        for (const subscriber of this.currentFileSubscribers){
+            subscriber(this.currentFile);
+        }
+    }
+
+    public subscribeToAllFiles(setAllFiles:(files:SongsFile[])=>void):() => void{
+        setAllFiles(this.filesModel.getFiles());
+        this.allFilesSubscribers.add(setAllFiles);
+        return () => {
+            this.allFilesSubscribers.delete(setAllFiles);
+        }
+    }
+
+    private updateAllFiles():void{
+        for (const subscriber of this.allFilesSubscribers){
+            subscriber(this.filesModel.getFiles());
+        }
+    }
+
+    public playFileAtIndex(index:number):void{
+        const file = this.filesModel.pickFile(index);
+
+        if (file === this.currentFile){
+            this.play();
+            return;
+        }
+        this.currentFile = file;
+        this.songsModel = new SongsModel(this.currentFile);
+
+        this.updateCurrentFile();
+
+        this.requestNewSong();
+    }
+
     // called by views to request a new song, i.e. if song finishes or user skips
     public requestNewSong():void{
 
         this.currentSong = this.songsModel.pickSong(this.antiRepetitionBias);
 
-        if (this.currentSong.sourceFormat === "local") {
-            this.audioSource.src = this.currentSong.source;
-            this.currentMode = "local";
-        } else {
-            window.youtubePlayer.loadVideoById(this.currentSong.source);
-            this.currentMode = "youtube";
-        }
-
-        this.play()
-
-        for (const subscriber of this.currentSongSubscribers){
-            subscriber(this.currentSong)
-        }
+        this.updateCurrentSong();
     }
 
     public uploadNewSong(song:Song):void{
@@ -179,6 +248,36 @@ class Controller{
     public updateSongAtIndex<K extends keyof Song>(index:number,attribute:K,value:Song[K]){
         this.songsModel.updateSongAtIndex(index,attribute,value);
         this.updateAllSongs();
+    }
+
+    public uploadNewFile(file:SongsFile):void{
+        this.filesModel.addFile(file);
+        this.updateAllFiles();
+    }
+
+    public deleteFileIndex(index:number):void{
+
+        if (this.filesModel.getFiles().length === 1){
+            window.alert("You must have at least one file");
+            return;
+        }
+
+        let fileChosenIsCurrent = false;
+        if (this.filesModel.pickFile(index) === this.currentFile){
+            fileChosenIsCurrent = true;
+        }
+
+        this.filesModel.deleteFileIndex(index);
+        this.updateAllFiles();
+
+        if (fileChosenIsCurrent){
+            this.playFileAtIndex(0);
+        }
+    }
+
+    public updateFileAtIndex<K extends keyof SongsFile>(index:number,attribute:K,value:SongsFile[K]){
+        this.filesModel.updateFileAtIndex(index,attribute,value);
+        this.updateAllFiles();
     }
 
     // this function essentially ensures that the youtube player's state aligns with the controller's

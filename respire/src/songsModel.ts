@@ -1,5 +1,5 @@
-import {type Song} from "./customTypes.ts";
-import {threeSecondSilence} from "./silence.ts";
+import type {Song} from "./customTypes.ts";
+import {SONG_PLACEHOLDER} from "./globalConstants.ts";
 import {getUniqueStringWithPrefix} from "./lib/strings.ts";
 
 export class SongsModel{
@@ -7,8 +7,8 @@ export class SongsModel{
     private readonly songProbabilities:number[];
     private numberOfSongs: number;
 
-    constructor() {
-        this.songs = [];
+    constructor(file: { name: string; version: number; songs: Song[] }) {
+        this.songs = file.songs;
         this.numberOfSongs = this.songs.length;
         this.songProbabilities = Array(this.numberOfSongs).fill(1);
     }
@@ -42,11 +42,27 @@ export class SongsModel{
         this.songs[index][attribute] = value;
     }
 
+    public pickSongIndex(index:number,antiRepetitionBias:number):Song{
+        // makes other songs more likely after picking a song
+        // you'd rather not hear the same song over and over
+        for (let i = 0; i<index;i++){
+            this.songProbabilities[i] += antiRepetitionBias;
+        }
+        for (let i = index+1; i<this.numberOfSongs;i++){
+            this.songProbabilities[i] += antiRepetitionBias;
+        }
+
+        // this ensures the same song never plays twice:
+        this.songProbabilities[index] = 0;
+
+        return this.songs[index];
+    }
+
     public pickSong(antiRepetitionBias:number):Song{
 
         // if no songs are uploaded
         if (this.numberOfSongs === 0){
-            return threeSecondSilence;
+            return SONG_PLACEHOLDER;
         }
 
         let sum = this.songProbabilities.reduce((a:number,b:number)=> {return a+b},0);
@@ -73,22 +89,10 @@ export class SongsModel{
         // if a song was not found
         if (this.songs[chosenSongIndex] === undefined){
             console.error("No suitable song available (not enough songs uploaded is likely the reason)");
-            return threeSecondSilence;
+            return SONG_PLACEHOLDER;
         }
 
-        // makes other songs more likely after picking a song
-        // you'd rather not hear the same song over and over
-        for (let i = 0; i<chosenSongIndex;i++){
-            this.songProbabilities[i] += antiRepetitionBias;
-        }
-        for (let i = chosenSongIndex+1; i<this.numberOfSongs;i++){
-            this.songProbabilities[i] += antiRepetitionBias;
-        }
-
-        // this ensures the same song never plays twice:
-        this.songProbabilities[chosenSongIndex] = 0;
-
-        return this.songs[chosenSongIndex];
+        return this.pickSongIndex(chosenSongIndex,antiRepetitionBias);
     }
 
     public getSongs():Song[]{

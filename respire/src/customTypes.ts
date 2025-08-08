@@ -6,7 +6,8 @@ export type Song = {
     source: string;
 };
 
-export type File = {
+export type SongsFile = {
+    name: string;
     version: number;
     songs: Song[];
 };

@@ -20,7 +20,7 @@ nav {
   background-color: darkgray;
 }
 
-.selected {
+nav > .selected {
   background-color: gray;
 }
 
@@ -34,6 +34,7 @@ nav {
 .buttons > *{
   margin: 0 5px;
   cursor: pointer;
+  flex: 1;
 }
 
 button {
@@ -41,4 +42,8 @@ button {
   font-size: inherit;
   border-radius: 10px;
   cursor: pointer;
+}
+
+.view{
+  margin: 0 2%;
 }
