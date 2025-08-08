@@ -165,6 +165,12 @@ class Controller{
     }
 
     public playSongAtIndex(index:number):void{
+
+        if (this.currentSong.title === this.songsModel.getSongs()[index].title){
+            this.play();
+            return;
+        }
+
         this.currentSong = this.songsModel.pickSongIndex(index,this.antiRepetitionBias);
         this.updateCurrentSong();
     }
