@@ -18,25 +18,6 @@ export function Player(){
         return controller.subscribeToPlaying(setPlaying);
     }, []);
 
-    useEffect(() => {
-
-        const handleKeyDown = (event:KeyboardEvent):void => {
-            if (event.key === " "){
-                event.preventDefault();
-
-                if (controller.currentlyPlaying()){
-                    controller.pause();
-                } else {
-                    controller.play();
-                }
-            }
-        }
-
-        document.addEventListener("keydown",handleKeyDown)
-
-        return () => document.removeEventListener("keydown",handleKeyDown);
-    }, []);
-
     return song === SONG_PLACEHOLDER ? (
         <div className="player">
             <p>

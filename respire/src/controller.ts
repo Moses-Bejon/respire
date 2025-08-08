@@ -325,4 +325,7 @@ window.playerSubscribers.add(
 );
 window.youtubePlayer.addEventListener("onStateChange",controller.youtubePlayerChangedState.bind(controller));
 
+import {handleKeyDown} from "./handleKeyDown.ts";
+document.addEventListener("keydown",handleKeyDown);
+
 console.log(controller);
