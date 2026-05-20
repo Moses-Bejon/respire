@@ -7,6 +7,7 @@ export function PlayBar() {
     const [progress,setProgress] = useState(0);
 
     const currentFrame = useRef(0);
+    const playBarRef = useRef<HTMLDivElement>(null);
 
     const nextRequest = () => {
         setProgress(controller.getTimestamp()/controller.getDuration());
@@ -19,13 +20,15 @@ export function PlayBar() {
     },[]);
 
     const seekTo = (pointerEvent: PointerEvent<HTMLDivElement>) => {
-        const rect = pointerEvent.currentTarget.getBoundingClientRect();
-        const proportion = (pointerEvent.clientX - rect.left)/rect.width;
+        const rect = playBarRef.current?.getBoundingClientRect();
+        if (!rect) return;
+
+        const proportion = Math.min(Math.max((pointerEvent.clientX - rect.left)/rect.width,0),1);
         controller.seekTo(proportion*controller.getDuration());
     }
 
     return (
-        <div className={"playBar"} onPointerDown={seekTo}>
+        <div className={"playBar"} ref={playBarRef} onPointerDown={seekTo}>
             <div className={"playBarProgress"} style={{width: `${progress*100}%`}}></div>
         </div>
     )
